@@ -4,7 +4,8 @@ const router = express.Router();
 
 const {
   createNotifications,
-  getNotifications
+  getNotifications,
+  markNotificationRead
 } = require("../controllers/notificationController");
 
 const { protect } = require("../middleware/authMiddleware");
@@ -17,5 +18,8 @@ router.post("/", createNotifications);
 
 // Get notification history
 router.get("/", getNotifications);
+
+// Mark a notification as read
+router.patch("/:id/read", markNotificationRead);
 
 module.exports = router;

@@ -2,12 +2,15 @@
 import React, { useState, useEffect, useRef } from "react";
 import API from "./services/api";
 import AuthScreen from "./components/AuthScreen";
+import NotificationBell from "./components/NotificationBell";
+import SettingsPage from "./components/SettingsPage";
+import HelpSupportPage from "./components/HelpSupportPage";
 import {
   Shield, LayoutDashboard, MapPin, Users, Clock3,
-  Settings, Bell, Search, Menu, X, Heart,
+  Settings, Search, Menu, X, Heart,
   Navigation, ShieldCheck, Activity, ChevronRight,
   Plus, Phone, Siren, CircleCheck, AlertTriangle,
-  LogOut, UserRound, ArrowUpRight, Crosshair
+  LogOut, ArrowUpRight, Crosshair
 } from "lucide-react";
 
 const menuItems = [
@@ -828,6 +831,14 @@ const handleSosClick = async () => {
   }
 };
 
+const handleSignOut = () => {
+  API.logout();
+  stopSosAlarm();
+  setUser(null);
+  setActive("Dashboard");
+  setSosActive(false);
+  setMobileMenu(false);
+};
 
     
 const stats = [
@@ -899,20 +910,24 @@ return (
             <div className="support-icon"><Heart size={18} /></div>
             <strong>We're here for you</strong>
             <p>Your safety is always our priority.</p>
-            <button onClick={() => setActive("Help & Support")}>Get Support <ArrowUpRight size={14} /></button>
+            <button onClick={() => {
+              setActive("Help & Support");
+              setMobileMenu(false);
+            }}>Get Support <ArrowUpRight size={14} /></button>
           </div>
-          <button className="nav-item settings-item" onClick={() => setActive("Settings")}>
+          <button
+            className="nav-item settings-item"
+            onClick={() => {
+              setActive("Settings");
+              setMobileMenu(false);
+            }}
+          >
   <Settings size={19} /><span>Settings</span>
 </button>
 
 <button
   className="nav-item settings-item"
-  onClick={() => {
-    API.logout();
-    setUser(null);
-    setActive("Dashboard");
-    setSosActive(false);
-  }}
+  onClick={handleSignOut}
 >
   <LogOut size={19} />
   <span>Sign Out</span>
@@ -941,7 +956,7 @@ return (
     : "Backend offline"}
 </div>
             <button className="icon-button"><Search size={19} /></button>
-            <button className="icon-button notification-button"><Bell size={19} /><i /></button>
+            <NotificationBell />
             <div className="top-avatar">K</div>
           </div>
         </header>
@@ -1126,7 +1141,7 @@ return (
                     </footer>
     </>
   ) : (
-  <section className="panel" style={{ margin: "28px", padding: "32px" }}>
+  <section className="panel workspace-panel">
     <span className="section-kicker">SHIELDHER WORKSPACE</span>
     <h2>{active}</h2>
 
@@ -1757,11 +1772,11 @@ return (
 )}
 
     {active === "Settings" && (
-      <p>Manage your SHIELDHER account settings here.</p>
+      <SettingsPage user={user} onSignOut={handleSignOut} />
     )}
 
     {active === "Help & Support" && (
-      <p>SHIELDHER support and safety information.</p>
+      <HelpSupportPage />
     )}
   </section>
 )}

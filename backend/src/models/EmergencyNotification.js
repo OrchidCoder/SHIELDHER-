@@ -49,6 +49,12 @@ const emergencyNotificationSchema = new mongoose.Schema(
       default: "Simulated"
     },
 
+    isRead: {
+      type: Boolean,
+      default: false,
+      index: true
+    },
+
     message: {
       type: String,
       required: true,

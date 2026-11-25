@@ -1,5 +1,6 @@
 
 const TOKEN_KEY = "shieldher_token";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
 async function request(path, options = {}) {
   const token = localStorage.getItem(TOKEN_KEY);
@@ -10,7 +11,7 @@ async function request(path, options = {}) {
     ...options.headers
   };
 
-  const response = await fetch(path, {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
     ...options,
     headers
   });
@@ -122,6 +123,13 @@ const API = {
 
   getEmergencyNotifications() {
     return request("/api/v1/emergency-notifications");
+  },
+
+  markEmergencyNotificationRead(id) {
+    return request(
+      `/api/v1/emergency-notifications/${encodeURIComponent(id)}/read`,
+      { method: "PATCH" }
+    );
   },
 
   // Safe Zones

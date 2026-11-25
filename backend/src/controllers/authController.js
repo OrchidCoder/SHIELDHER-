@@ -72,7 +72,9 @@ exports.register = async (req, res, next) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role
+        role: user.role,
+        isActive: user.isActive,
+        createdAt: user.createdAt
       }
     });
 
@@ -133,7 +135,9 @@ exports.login = async (req, res, next) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role
+        role: user.role,
+        isActive: user.isActive,
+        createdAt: user.createdAt
       }
     });
 
@@ -152,6 +156,7 @@ exports.getMe = async (req, res) => {
       name: req.user.name,
       email: req.user.email,
       role: req.user.role,
+      isActive: req.user.isActive,
       createdAt: req.user.createdAt
     }
   });
