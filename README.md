@@ -1,19 +1,45 @@
 # SHIELDHER -- Smart Women Safety & Emergency Response Platform
 
-SHIELDHER is a women-safety web application designed to help users
-manage emergency incidents, share their current location, maintain
-trusted contacts, and define safe zones. It combines a React-based
-frontend, a Node.js/Express backend, and MongoDB Atlas.
+SHIELDHER is a women-safety web application and B.Tech CSE capstone
+project. It helps users manage emergency incident records, share their
+current location, maintain trusted contacts, and define safe zones. The
+application combines a React frontend, a Node.js/Express backend, and
+MongoDB Atlas.
 
-> **Project status:** Core application modules have been implemented.
-> AWS production deployment is in progress. Emergency contact
-> notifications are currently simulated; the application does **not**
-> send real SMS or WhatsApp messages or contact emergency services.
+## Live Application & AWS Production Deployment
+
+**Production status: deployed and accessible over HTTPS.**
+
+- **Live Application:** [https://13-127-217-122.sslip.io](https://13-127-217-122.sslip.io)
+- **AWS Production Deployment:** [https://13-127-217-122.sslip.io](https://13-127-217-122.sslip.io)
+- **GitHub Repository:** [https://github.com/OrchidCoder/SHIELDHER-](https://github.com/OrchidCoder/SHIELDHER-)
+
+The production architecture uses only these five AWS services:
+
+- **IAM:** Identity and access management.
+- **VPC:** Network environment for AWS resources.
+- **EC2:** Hosts the Node.js/Express application and Nginx.
+- **EBS:** Block storage attached to EC2.
+- **S3:** Static frontend hosting.
+
+MongoDB Atlas is the application's external database provider. It is not
+an additional AWS service. The production web application is available
+over HTTPS through the URL above. The `sslip.io` hostname depends on the
+EC2 public IP; if that IP changes, the hostname and related production
+configuration may need updating.
+
+> **Emergency communication notice:** SOS activity and notification
+> records are part of an academic demo. SHIELDHER does **not** send real
+> SMS or WhatsApp messages and does **not** automatically contact
+> police or emergency services. The application does not guarantee an
+> emergency response. In an actual emergency, contact the appropriate
+> local emergency service.
 
 ## Table of Contents
 
 -   [Features](#features)
 -   [Technology Stack](#technology-stack)
+-   [Live Application & AWS Production Deployment](#live-application--aws-production-deployment)
 -   [Project Structure](#project-structure)
 -   [Prerequisites](#prerequisites)
 -   [Getting Started](#getting-started)
@@ -42,31 +68,28 @@ frontend, a Node.js/Express backend, and MongoDB Atlas.
 -   **Safe-zone event history:** Store safe-zone monitoring events in
     MongoDB.
 -   **Emergency notification records:** Create simulated notification
-    records for trusted contacts during the SOS flow.
+    records associated with trusted contacts during the SOS flow.
+-   **Notification dropdown:** View notification status and unread
+    count, refresh records, and mark individual records as read.
+-   **Settings:** View available account and session information,
+    security guidance, and sign out.
+-   **Help and Support:** Review emergency guidance, FAQs, and safety
+    and privacy information.
 -   **Dashboard:** Web interface for interacting with the application's
     modules.
 
 ## Technology Stack
 
-  -----------------------------------------------------------------------
-  Layer                               Technology
-  ----------------------------------- -----------------------------------
-  Frontend                            React, Vite, JavaScript
-
-  Backend                             Node.js, Express
-
-  Database                            MongoDB Atlas, Mongoose
-
-  Authentication                      JSON Web Token (JWT), bcryptjs
-
-  Security and middleware             Helmet, CORS, express-rate-limit
-
-  Cloud / deployment target           AWS (EC2, EBS, VPC, S3 planned for
-                                      frontend hosting)
-
-  Web server / reverse proxy          Nginx planned for production
-                                      routing
-  -----------------------------------------------------------------------
+| Layer | Technologies |
+|---|---|
+| Frontend | React, Vite, JavaScript, CSS, Lucide React |
+| Backend | Node.js, Express |
+| Database | MongoDB Atlas, Mongoose |
+| Authentication | JSON Web Token (JWT), bcryptjs |
+| Security and middleware | Helmet, CORS, express-rate-limit |
+| Web server | Nginx |
+| Production transport | HTTPS |
+| AWS deployment | IAM, VPC, EC2, EBS, S3 |
 
 ## Project Structure
 
@@ -215,6 +238,13 @@ The SOS flow creates an incident record in the backend. The application
 also creates simulated notification records for configured trusted
 contacts. These records are not proof that a message was delivered.
 
+### Emergency notification records
+
+The authenticated dashboard can display the user's notification
+records, unread count, incident type, message, and read status. A user
+can mark an individual record as read. These records are simulated and
+do not indicate that an SMS or WhatsApp message was sent.
+
 ### GPS and safe zones
 
 The frontend uses the browser Geolocation API. Location access requires
@@ -227,36 +257,39 @@ with saved zone boundaries and records events.
 Trusted contacts and incident history are managed through backend API
 routes and persisted in MongoDB.
 
+### Settings and Help & Support
+
+Settings displays available account information and security guidance,
+and provides the existing sign-out action. Account details are
+read-only where profile-editing APIs are not available. Help & Support
+provides emergency guidance, FAQs, and safety and privacy reminders.
+
 ## AWS Deployment
 
-The intended cloud deployment uses AWS services:
+The production application is deployed at
+[https://13-127-217-122.sslip.io](https://13-127-217-122.sslip.io). Its
+AWS footprint is limited to the five services below:
 
--   **IAM:** Identity and access management.
--   **VPC:** Network environment for the server.
--   **EC2:** Linux virtual machine for the backend.
--   **EBS:** Block storage attached to EC2.
--   **S3:** Planned hosting for the built frontend.
+| AWS service | Role in SHIELDHER |
+|---|---|
+| IAM | Manages identities and permissions. |
+| VPC | Provides the AWS network environment. |
+| EC2 | Runs the Node.js/Express backend and Nginx. |
+| EBS | Provides block storage attached to EC2. |
+| S3 | Hosts the static frontend. |
 
-The backend has previously been copied to `/var/www/shieldher` on an
-Amazon Linux EC2 instance, and production Node.js dependencies have been
-installed there. The live production service, Nginx reverse proxy, and
-S3 frontend hosting must be verified and completed before describing the
-application as publicly deployed.
+MongoDB Atlas provides the database outside this AWS service list. Nginx
+is used in the production web-server path, and the public application
+URL is HTTPS. The `sslip.io` hostname is based on the EC2 public IP, so
+an IP change may require updating the hostname and related production
+configuration.
 
-A typical deployment sequence is:
-
-1.  Configure the production environment variables securely on EC2.
-2.  Verify that EC2 can connect to MongoDB Atlas.
-3.  Test the backend health endpoint locally on the EC2 host.
-4.  Configure a `systemd` service to keep the backend running.
-5.  Configure Nginx as a reverse proxy.
-6.  Build the frontend and upload its build output to S3.
-7.  Configure the frontend API base URL and CORS origin.
-8.  Test the deployed application end to end.
-
-Do not expose the backend port directly to the public internet. Prefer
-routing HTTP/HTTPS traffic through Nginx and restrict SSH access to
-trusted IP addresses.
+For future releases, build the frontend with its production API
+configuration and publish the build to the existing S3 frontend
+hosting. Deploy backend changes to the existing EC2 application using
+the established service process. Keep production environment files and
+deployment credentials out of the repository. Route public web traffic
+through Nginx and restrict SSH access to trusted source addresses.
 
 ## Security Notes
 
@@ -265,26 +298,30 @@ trusted IP addresses.
 -   Use least-privilege IAM roles instead of long-lived AWS access keys
     on EC2.
 -   Keep SSH restricted to trusted source IP addresses.
--   Use HTTPS for production, especially for browser geolocation and
-    authentication.
+-   The production application is available over HTTPS; continue to
+    protect authentication and location data in transit.
 -   Treat browser GPS data as user-device data that may be unavailable,
     inaccurate, or permission-denied.
 -   Do not represent simulated notification records as real emergency
     communication.
--   This project is a safety-support tool and is not a replacement for
-    local emergency services.
+-   SHIELDHER is an academic safety-support demo, not a replacement for
+    local emergency services or a guaranteed emergency response.
 
 ## Current Limitations
 
 -   SMS and WhatsApp delivery are not implemented; notification records
     are simulated.
 -   Automatic police/emergency-service dispatch is not implemented.
--   Production AWS deployment is still being completed and must be
-    tested before public use.
 -   GPS availability and accuracy depend on the user's device, browser,
     permissions, and network conditions.
--   HTTPS and a production domain/certificate need to be configured for
-    a secure public deployment.
+-   The `sslip.io` hostname depends on the EC2 public IP and may need to
+    be updated if that IP changes.
+-   Account profile editing and password changes are not currently
+    available in the application.
+-   No separate support phone number, email address, or support URL is
+    configured in the application.
+-   The application is an academic demo and does not guarantee an
+    emergency response.
 
 ## Future Improvements
 
@@ -293,7 +330,7 @@ trusted IP addresses.
 -   Add optional live location sharing with explicit user control.
 -   Add push notifications and delivery status.
 -   Add audit logging, monitoring, backups, and automated tests.
--   Complete HTTPS deployment and production security review.
+-   Continue production security, reliability, and privacy reviews.
 -   Improve accessibility, responsive design, and usability testing.
 
 ------------------------------------------------------------------------
@@ -302,6 +339,7 @@ trusted IP addresses.
 
 **Project:** SHIELDHER -- Smart Women Safety & Emergency Response
 Platform\
+**Program:** B.Tech CSE (AI/ML)\
 **Domain:** Web Development, Cloud Computing, and Emergency Response\
 **Purpose:** Academic capstone project
 
